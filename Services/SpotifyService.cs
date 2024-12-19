@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
+using Serilog;
 using Spotify2YouTube.Models;
 using Spotify2YT.Models;
 using System.Net.Http.Headers;
@@ -13,6 +14,7 @@ namespace Spotify2YT.Services
 
         public async Task<string> GetUrlAuthorizeAsync(string uri)
         {
+            Log.Information("GetUrlAuthorizeAsync Init");
             var spotifyCredentials = await GetSpotifyCredentialsAsync();
             string state = GenerateRandomString();
 
@@ -25,6 +27,8 @@ namespace Spotify2YT.Services
                 { "state", state }
             };
 
+            Log.Information(QueryHelpers.AddQueryString(urlAuthorize, queryParams));
+            Log.Information("GetUrlAuthorizeAsync End");
             //return $"{urlAuthorize}?response_type=code&client_id={spotifyCredentials?.ClientId}&scope={scope}&redirect_uri={uri}&state={state}";
             return QueryHelpers.AddQueryString(urlAuthorize, queryParams);
         }
@@ -33,7 +37,9 @@ namespace Spotify2YT.Services
 
         public async Task<string?> GetTokenAsync(string uri, string code)
         {
+            Log.Information("GetTokenAsync Init");
             var spotifyCredentials = await GetSpotifyCredentialsAsync();
+            var token = "";
 
             var queryParams = new Dictionary<string, string?>
             {
@@ -53,27 +59,38 @@ namespace Spotify2YT.Services
             if (response.IsSuccessStatusCode)
             {
                 string readAsStringAsync = (await response.Content.ReadAsStringAsync()) ?? "";
+                Log.Information(readAsStringAsync);
                 SpotifyTokenModel? SpotifyTokenModel = JsonConvert.DeserializeObject<SpotifyTokenModel>(readAsStringAsync);
-                return SpotifyTokenModel?.AccessToken;
+                token = SpotifyTokenModel?.AccessToken;
             }
-            return "";
+            else
+            {
+                string errorContent = await response.Content.ReadAsStringAsync();
+                int statusCode = (int)response.StatusCode;
+                Log.Error($"Error {statusCode}: {errorContent}");
+            }
+            Log.Information("GetTokenAsync End");
+            return token;
         }
 
         public string urlPlayList = "https://api.spotify.com/v1/playlists";
 
         public async Task<List<SpotifyTrackListModel>> GetListPlaylistAsync(string playList, string token)
         {
+            Log.Information("GetListPlaylistAsync Init");
             List<SpotifyTrackListModel> SpotifyTrackListModel = [];
 
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            Log.Information($"{urlPlayList}/{playList}");
             HttpResponseMessage response = await httpClient.GetAsync($"{urlPlayList}/{playList}");
 
             if (response.IsSuccessStatusCode)
             {
-                string readAsStringAsync = (await response.Content.ReadAsStringAsync()) ?? "";
-                SpotifyPlaylistModel? SpotifyPlaylistModel = JsonConvert.DeserializeObject<SpotifyPlaylistModel>(readAsStringAsync);
+                string content = (await response.Content.ReadAsStringAsync()) ?? "";
+                Log.Information(content);
+                SpotifyPlaylistModel? SpotifyPlaylistModel = JsonConvert.DeserializeObject<SpotifyPlaylistModel>(content);
 
                 foreach (var _SpotifyPlaylistModel in SpotifyPlaylistModel?.Tracks.Items ?? [])
                 {
@@ -91,6 +108,13 @@ namespace Spotify2YT.Services
 
                 return SpotifyTrackListModel;
             }
+            else
+            {
+                string errorContent = await response.Content.ReadAsStringAsync();
+                int statusCode = (int)response.StatusCode;
+                Log.Error($"Error {statusCode}: {errorContent}");
+            }
+            Log.Information("GetListPlaylistAsync End");
             return [];
         }
 

@@ -1,8 +1,9 @@
 ﻿@page "/"
 @rendermode InteractiveServer
-@using Spotify2YT.States;
+@using Serilog
+@using Spotify2YT.States
 @using Spotify2YT.Services
-@using Spotify2YT.Models;
+@using Spotify2YT.Models
 @inject IConfiguration Configuration
 @inject NavigationManager Navigation
 @inject MainStateService<string, string> MainState
@@ -147,7 +148,7 @@
 
     protected override void OnInitialized()
     {
-        var demo = MainState.ActiveSpotify;
+        Log.Information("Inicio Home");
     }
 
     private async Task ConnectSpotify()

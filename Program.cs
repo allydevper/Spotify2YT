@@ -1,9 +1,15 @@
+using Serilog;
 using Spotify2YT.Components;
 using Spotify2YT.Services;
 using Spotify2YT.States;
 using Spotify2YT.ViewModel;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console() // Registrar en la consola
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day) // Registrar en archivo
+    .CreateLogger();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -12,6 +18,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddSingleton(typeof(MainStateService<,>));
 builder.Services.AddSingleton<SpotifyService>();
 builder.Services.AddSingleton<CounterViewModel>();
+
+builder.Logging.ClearProviders();
 
 var app = builder.Build();
 
