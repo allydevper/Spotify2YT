@@ -1,7 +1,9 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using Spotify2YT.States;
 @inject IConfiguration Configuration
 @inject NavigationManager Navigation
+@inject MainStateService<string, string> MainState
 
 <header class="container my-5">
     <h1 class="title">
@@ -15,7 +17,7 @@
 <div class="container text-center">
     <div class="d-flex justify-content-center gap-3 mt-4">
         <!-- Spotify Button -->
-        <button class="btn btn-spotify btn-lg px-4"
+        <button class="btn btn-spotify btn-lg px-4 @(MainState.ActiveSpotify ? "btn-spotify-active" : "")"
                 type="button"
                 @onclick="ConnectSpotify">
             <span>
@@ -25,10 +27,11 @@
                     <path d="M17 3.34a10 10 0 1 1 -15 8.66l.005 -.324a10 10 0 0 1 14.995 -8.336m-2.168 11.605c-1.285 -1.927 -4.354 -2.132 -6.387 -.777a1 1 0 0 0 1.11 1.664c1.195 -.797 3.014 -.675 3.613 .223a1 1 0 1 0 1.664 -1.11m1.268 -3.245c-2.469 -1.852 -5.895 -2.187 -8.608 -.589a1 1 0 0 0 1.016 1.724c1.986 -1.171 4.544 -.92 6.392 .465a1 1 0 0 0 1.2 -1.6m1.43 -3.048c-3.677 -2.298 -7.766 -2.152 -10.977 -.546a1 1 0 0 0 .894 1.788c2.635 -1.317 5.997 -1.437 9.023 .454a1 1 0 1 0 1.06 -1.696" />
                 </svg>
             </span>
-            Conecta Spotify
+            @(MainState.ActiveSpotify ? "Spotify Conectado" : "Conecta Spotify")
         </button>
         <!-- YouTube Button -->
-        <button href="https://www.youtube.com" target="_blank" class="btn btn-youtube btn-lg px-4">
+        <button class="btn btn-youtube btn-lg px-4 @(MainState.ActiveYT ? "btn-youtube-active" : "")"
+                type="button">
             <span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                      fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-brand-youtube">
@@ -37,7 +40,7 @@
                 </svg>
             </span>
             <span>
-                Conecta YouTube
+                @(MainState.ActiveYT ? "YouTube Conectado" : "Conecta YouTube")
             </span>
         </button>
     </div>
@@ -79,10 +82,15 @@
 
     protected override void OnInitialized()
     {
+        var demo = MainState.ActiveSpotify;
     }
 
-    private void ConnectSpotify()
+    private async Task ConnectSpotify()
     {
-        Navigation.NavigateTo("/callback");
+        if (!MainState.ActiveSpotify)
+        {
+            await MainState.SaveStateActiveSpotifyAsync(true);
+            Navigation.NavigateTo("/callback");
+        }
     }
 }

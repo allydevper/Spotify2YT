@@ -103,6 +103,11 @@ span.youtube-text > span {
     font-weight: bold;
 }
 
+.btn-spotify-active {
+    background: #1aa34a;
+    border: 3px solid #1aa34a;
+}
+
     .btn-spotify:hover {
         background-color: #1aa34a;
     }
@@ -111,6 +116,11 @@ span.youtube-text > span {
     border: 3px solid #cc181e;
     color: white !important;
     font-weight: bold;
+}
+
+.btn-youtube-active {
+    background: #cc0000;
+    border: 3px solid #cc0000;
 }
 
     .btn-youtube:hover {

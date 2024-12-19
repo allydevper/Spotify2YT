@@ -1,5 +1,6 @@
 using Spotify2YT.Components;
 using Spotify2YT.Services;
+using Spotify2YT.States;
 using Spotify2YT.ViewModel;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddSingleton(typeof(MainStateService<,>));
 builder.Services.AddSingleton<SpotifyService>();
 builder.Services.AddSingleton<CounterViewModel>();
 

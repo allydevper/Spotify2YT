@@ -2,8 +2,10 @@
 @page "/callback/{code}/{state}"
 @using Microsoft.AspNetCore.Components
 @using Spotify2YT.Services
+@using Spotify2YT.States;
 @inject NavigationManager Navigation
 @inject SpotifyService SpotifyService
+@inject MainStateService<string, string> MainState
 
 <h3>Callback</h3>
 
@@ -24,11 +26,19 @@
         if (string.IsNullOrEmpty(Code))
         {
             string authorizationUrl = await SpotifyService.GetUrlAuthorizeAsync(uri);
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo(authorizationUrl);
         }
         else
         {
-            // string authorizationUrl = await SpotifyService.GetUrlTokenAsync(uri);
+            string? token = await SpotifyService.GetTokenAsync(uri, Code);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                await MainState.SaveStateTokenSpotifyAsync(token);
+                await MainState.SaveStateActiveSpotifyAsync(true);
+            }
+
+            Navigation.NavigateTo("/");
         }
     }
 
