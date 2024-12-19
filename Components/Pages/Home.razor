@@ -30,7 +30,7 @@
             @(MainState.ActiveSpotify ? "Spotify Conectado" : "Conecta Spotify")
         </button>
         <!-- YouTube Button -->
-        <button class="btn btn-youtube btn-lg px-4 @(MainState.ActiveYT ? "btn-youtube-active" : "")"
+@*         <button class="btn btn-youtube btn-lg px-4 @(MainState.ActiveYT ? "btn-youtube-active" : "")"
                 type="button">
             <span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -42,7 +42,7 @@
             <span>
                 @(MainState.ActiveYT ? "YouTube Conectado" : "Conecta YouTube")
             </span>
-        </button>
+        </button> *@
     </div>
 </div>
 
@@ -51,15 +51,19 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="input-group mt-2">
-                <input type="text" class="form-control input-custom" placeholder="Playlist Id">
-                <button class="btn btn-custom">Obtener</button>
+                <input  type="text" 
+                        class="form-control input-custom" 
+                        placeholder="Playlist Id"
+                        disabled="@(!MainState.ActiveSpotify)">
+                <button class="btn btn-custom" 
+                        disabled="@(!MainState.ActiveSpotify)">Obtener</button>
             </div>
         </div>
     </div>
 </section>
 
 <section class="container text-center my-5">
-    <button class="btn btn-custom px-4">
+    <button class="btn btn-custom px-4" disabled="@(!MainState.ActiveSpotify)">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
              stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
@@ -72,7 +76,10 @@
     <div class="row justify-content-center my-2">
         <div class="col-md-4">
             <div class="input-group mt-2">
-                <input type="text" class="form-control input-custom" placeholder="Nuevo nombre de Playlist">
+                <input  type="text" 
+                        class="form-control input-custom" 
+                        placeholder="Nuevo nombre de Playlist"
+                        disabled="@(!MainState.ActiveSpotify)">
             </div>
         </div>
     </div>
