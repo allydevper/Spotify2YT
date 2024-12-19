@@ -6,8 +6,9 @@
 @using Spotify2YT.Models
 @inject IConfiguration Configuration
 @inject NavigationManager Navigation
-@inject MainStateService<string, string> MainState
+@inject MainStateService<TrackModel> MainState
 @inject SpotifyService SpotifyService
+@inject YouTubeService YouTubeService
 
 <header class="container my-5">
     <h1 class="title">
@@ -159,7 +160,7 @@
 }
 
 @code{
-    public List<SpotifyTrackListModel> SpotifyTrackListModel = [];
+    public List<TrackModel> SpotifyTrackListModel = [];
     private string PlaylistId { get; set; } = string.Empty;
     private string PlaylistName { get; set; } = string.Empty;
 
@@ -181,17 +182,19 @@
     {
         if (!string.IsNullOrEmpty(PlaylistId))
         {
-            var authorizationUrl = await SpotifyService.GetListPlaylistAsync(MainState.TokenSpotify, PlaylistId);
-            SpotifyTrackListModel.AddRange(authorizationUrl);
+            var playlist = await SpotifyService.GetListPlaylistAsync(MainState.TokenSpotify, PlaylistId);
+            await MainState.SaveStateItemsSpotifyAsync(playlist);
+            SpotifyTrackListModel.AddRange(playlist);
         }
     }
 
     private async Task CreatePlaylistYT()
     {
-        if (!string.IsNullOrEmpty(PlaylistName))
+        if (!string.IsNullOrEmpty(PlaylistName) && SpotifyTrackListModel.Count > 0)
         {
-            var authorizationUrl = await SpotifyService.GetListPlaylistAsync(MainState.TokenSpotify, PlaylistId);
-            SpotifyTrackListModel.AddRange(authorizationUrl);
+            var playlist = await YouTubeService.CreatePlaylistYTAsync(PlaylistName, SpotifyTrackListModel);
+            await MainState.SaveStateItemsYTAsync(playlist);
+            SpotifyTrackListModel.AddRange(playlist);
         }
     }
 }

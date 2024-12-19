@@ -75,10 +75,10 @@ namespace Spotify2YT.Services
 
         public string urlPlayList = "https://api.spotify.com/v1/playlists";
 
-        public async Task<List<SpotifyTrackListModel>> GetListPlaylistAsync(string playList, string token)
+        public async Task<List<TrackModel>> GetListPlaylistAsync(string playList, string token)
         {
             Log.Information("GetListPlaylistAsync Init");
-            List<SpotifyTrackListModel> SpotifyTrackListModel = [];
+            List<TrackModel> TrackModel = [];
 
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -97,7 +97,7 @@ namespace Spotify2YT.Services
                     string cover = _SpotifyPlaylistModel.Track.Album.Images.FirstOrDefault(s => s.Width == 64)?.Url
                                 ?? "https://placehold.co/64";
 
-                    SpotifyTrackListModel _SpotifyTrackListModel = new()
+                    TrackModel _TrackModel = new()
                     {
                         Id = _SpotifyPlaylistModel.Track.Id,
                         NameTrack = _SpotifyPlaylistModel.Track.Name,
@@ -106,7 +106,7 @@ namespace Spotify2YT.Services
                     };
                 }
 
-                return SpotifyTrackListModel;
+                return TrackModel;
             }
             else
             {

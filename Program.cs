@@ -15,8 +15,9 @@ Log.Logger = new LoggerConfiguration()
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddSingleton(typeof(MainStateService<,>));
+builder.Services.AddSingleton(typeof(MainStateService<>));
 builder.Services.AddSingleton<SpotifyService>();
+builder.Services.AddSingleton<YouTubeService>();
 builder.Services.AddSingleton<CounterViewModel>();
 
 builder.Logging.ClearProviders();
