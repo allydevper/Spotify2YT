@@ -1,9 +1,12 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @using Spotify2YT.States;
+@using Spotify2YT.Services
+@using Spotify2YT.Models;
 @inject IConfiguration Configuration
 @inject NavigationManager Navigation
 @inject MainStateService<string, string> MainState
+@inject SpotifyService SpotifyService
 
 <header class="container my-5">
     <h1 class="title">
@@ -54,9 +57,13 @@
                 <input  type="text" 
                         class="form-control input-custom" 
                         placeholder="Playlist Id"
+                        @bind="PlaylistId"
                         disabled="@(!MainState.ActiveSpotify)">
                 <button class="btn btn-custom" 
-                        disabled="@(!MainState.ActiveSpotify)">Obtener</button>
+                        disabled="@(!MainState.ActiveSpotify)"
+                        @onclick="GetPlaylistSpotify">
+                    Obtener
+                </button>
             </div>
         </div>
     </div>
@@ -85,7 +92,58 @@
     </div>
 </section>
 
+@if (SpotifyTrackListModel.Any())
+{
+    <section class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-9 double-box">
+                <div class="list-box">
+                    <h5 class="text-center">Origen</h5>
+                    <div class="list-group">
+                        @foreach (var _item in SpotifyTrackListModel)
+                        {
+                            <div class="list-group-item d-flex align-items-center">
+                                <img src="@_item.Cover" alt="@_item.NameTrack"
+                                     style="width: 64px; height: 64px; object-fit: cover; margin-right: 15px;">
+                                <div class="flex-grow-1">
+                                    <p class="mb-1 fs-6 fw-bold">@_item.NameTrack</p>
+                                    <p class="mb-1 fw-light fs-small">@_item.Artist</p>
+                                </div>
+                                <button class="btn btn-custom btn-delete rounded-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="currentColor"
+                                         class="icon icon-tabler icons-tabler-filled icon-tabler-trash-x">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M20 6a1 1 0 0 1 .117 1.993l-.117 .007h-.081l-.919 11a3 3 0 0 1 -2.824 2.995l-.176 .005h-8c-1.598 0 -2.904 -1.249 -2.992 -2.75l-.005 -.167l-.923 -11.083h-.08a1 1 0 0 1 -.117 -1.993l.117 -.007h16zm-9.489 5.14a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" />
+                                        <path d="M14 2a2 2 0 0 1 2 2a1 1 0 0 1 -1.993 .117l-.007 -.117h-4l-.007 .117a1 1 0 0 1 -1.993 -.117a2 2 0 0 1 1.85 -1.995l.15 -.005h4z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="icon icon-tabler icons-tabler-outline icon-tabler-arrows-right">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M21 17l-18 0" />
+                        <path d="M18 4l3 3l-3 3" />
+                        <path d="M18 20l3 -3l-3 -3" />
+                        <path d="M21 7l-18 0" />
+                    </svg>
+                </div>
+                <div class="list-box">
+                    <h5 class="text-center">Encontrados</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
 @code{
+    public List<SpotifyTrackListModel> SpotifyTrackListModel = [];
+    private string PlaylistId { get; set; } = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -98,6 +156,15 @@
         {
             await MainState.SaveStateActiveSpotifyAsync(true);
             Navigation.NavigateTo("/callback");
+        }
+    }
+
+    private async Task GetPlaylistSpotify()
+    {
+        if (!string.IsNullOrEmpty(PlaylistId))
+        {
+            var authorizationUrl = await SpotifyService.GetListPlaylistAsync(MainState.TokenSpotify, PlaylistId);
+            SpotifyTrackListModel.AddRange(authorizationUrl);
         }
     }
 }

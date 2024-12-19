@@ -59,6 +59,41 @@ namespace Spotify2YT.Services
             return "";
         }
 
+        public string urlPlayList = "https://api.spotify.com/v1/playlists";
+
+        public async Task<List<SpotifyTrackListModel>> GetListPlaylistAsync(string playList, string token)
+        {
+            List<SpotifyTrackListModel> SpotifyTrackListModel = [];
+
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage response = await httpClient.GetAsync($"{urlPlayList}/{playList}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string readAsStringAsync = (await response.Content.ReadAsStringAsync()) ?? "";
+                SpotifyPlaylistModel? SpotifyPlaylistModel = JsonConvert.DeserializeObject<SpotifyPlaylistModel>(readAsStringAsync);
+
+                foreach (var _SpotifyPlaylistModel in SpotifyPlaylistModel?.Tracks.Items ?? [])
+                {
+                    string cover = _SpotifyPlaylistModel.Track.Album.Images.FirstOrDefault(s => s.Width == 64)?.Url
+                                ?? "https://placehold.co/64";
+
+                    SpotifyTrackListModel _SpotifyTrackListModel = new()
+                    {
+                        Id = _SpotifyPlaylistModel.Track.Id,
+                        NameTrack = _SpotifyPlaylistModel.Track.Name,
+                        Artist = _SpotifyPlaylistModel.Track.Artists.ToList().FirstOrDefault()?.Name ?? "",
+                        Cover = cover,
+                    };
+                }
+
+                return SpotifyTrackListModel;
+            }
+            return [];
+        }
+
         private static async Task<SpotifyCredentialsModel?> GetSpotifyCredentialsAsync()
         {
             var filePath = "wwwroot/credentials/spotify_credentials.json";

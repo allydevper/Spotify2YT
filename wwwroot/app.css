@@ -34,6 +34,21 @@ h2 {
         background-color: linear-gradient(0deg, #ffffff 80%, #3a525a);
     }
 
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1b1f24;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3a525a;
+}
+
+/* Custom */
+
 .btn-custom {
     background-color: #5efc82;
     color: #000;
@@ -43,6 +58,10 @@ h2 {
     .btn-custom:hover {
         background-color: #4ee471;
     }
+
+.btn-delete {
+    padding: 8px;
+}
 
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
