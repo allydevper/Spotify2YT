@@ -9,8 +9,9 @@ namespace Spotify2YT.Services
 {
     public class YouTubeService
     {
-        public async Task CreatePlaylistYTAsync(string playlistName, List<TrackModel> trackSpotifyModels)
+        public async Task<List<TrackModel>> CreatePlaylistYTAsync(string playlistName, List<TrackModel> trackSpotifyModels)
         {
+            Log.Information("CreatePlaylistYTAsync Init");
             YouTubeV3Service youtubeService = await GetYouTubeServiceAsync();
 
             List<TrackModel> trackYTModel = [];
@@ -27,6 +28,9 @@ namespace Spotify2YT.Services
             {
                 await AddTrackToPlayListAsync(youtubeService, _trackYT, playlistId);
             }
+
+            Log.Information("CreatePlaylistYTAsync Init");
+            return trackYTModel;
         }
 
         private static async Task<TrackModel> GetTrackYTAsync(YouTubeV3Service youtubeService, TrackModel trackSpotify)
@@ -107,7 +111,8 @@ namespace Spotify2YT.Services
             var insertRequest = youtubeService.PlaylistItems.Insert(playlistItem, "snippet");
             var insertResponse = await insertRequest.ExecuteAsync();
 
-            Console.WriteLine($"Canción agregada a la lista de reproducción: {insertResponse.Snippet.Title}");
+            Log.Information($"Canción agregada a la lista de reproducción: {insertResponse.Snippet.Title}");
+            Log.Information("AddTrackToPlayListAsync End");
         }
 
         public async Task<YouTubeV3Service> GetYouTubeServiceAsync()
