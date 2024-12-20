@@ -5,8 +5,6 @@
         public bool ActiveSpotify { get; set; } = false;
         public string TokenSpotify { get; set; } = "";
         public bool ActiveYT { get; set; } = false;
-        public List<T> ItemsSpotify { get; set; } = [];
-        public List<T> ItemsYT { get; set; } = [];
 
         public Task SaveStateActiveSpotifyAsync(bool activeSpotify)
         {
@@ -26,21 +24,9 @@
             return Task.CompletedTask;
         }
 
-        public Task SaveStateItemsSpotifyAsync(List<T> itemsSpotify)
+        public Task<(bool activeSpotify, bool activeYT)> GetStateAsync()
         {
-            ItemsSpotify = itemsSpotify;
-            return Task.CompletedTask;
-        }
-
-        public Task SaveStateItemsYTAsync(List<T> itemsYT)
-        {
-            ItemsYT = itemsYT;
-            return Task.CompletedTask;
-        }
-
-        public Task<(bool activeSpotify, bool activeYT, List<T> itemsSpotify, List<T> itemsYT)> GetStateAsync()
-        {
-            return Task.FromResult((ActiveSpotify, ActiveYT, ItemsSpotify, ItemsYT));
+            return Task.FromResult((ActiveSpotify, ActiveYT));
         }
     }
 }

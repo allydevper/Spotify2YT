@@ -1,36 +1,26 @@
 ﻿@page "/callback"
-@page "/callback/{code}/{state}"
 @using Microsoft.AspNetCore.Components
 @using Spotify2YT.Services
-@using Spotify2YT.States;
+@using Spotify2YT.States
+@using Spotify2YT.Models
 @inject NavigationManager Navigation
 @inject SpotifyService SpotifyService
-@inject MainStateService<string> MainState
+@inject MainStateService<TrackModel> MainState
 
 <h3>Callback</h3>
 
-<p>Code: @Code</p>
-<p>State: @State</p>
-
 @code {
-    [Parameter]
-    public string Code { get; set; } = string.Empty;
-
-    [Parameter]
-    public string State { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        var uri = Navigation.Uri;
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
 
-        if (string.IsNullOrEmpty(Code))
+        string path = $"{uri.Scheme}://{uri.Host}:{uri.Port}{uri.AbsolutePath}";
+
+        if (queryParams.TryGetValue("code", out var codeValue))
         {
-            string authorizationUrl = await SpotifyService.GetUrlAuthorizeAsync(uri);
-            Navigation.NavigateTo(authorizationUrl);
-        }
-        else
-        {
-            string? token = await SpotifyService.GetTokenAsync(uri, Code);
+            string? token = await SpotifyService.GetTokenAsync(path, codeValue.ToString());
 
             if (!string.IsNullOrEmpty(token))
             {
@@ -39,6 +29,11 @@
             }
 
             Navigation.NavigateTo("/");
+        }
+        else
+        {
+            string authorizationUrl = await SpotifyService.GetUrlAuthorizeAsync(path);
+            Navigation.NavigateTo(authorizationUrl);
         }
     }
 

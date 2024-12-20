@@ -52,7 +52,7 @@ namespace Spotify2YT.Services
 
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{spotifyCredentials?.ClientId}:{spotifyCredentials?.ClientSecret}")));
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-www-form-urlencoded"));
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             HttpResponseMessage response = await httpClient.PostAsync(urlToken, content);
 
@@ -75,7 +75,7 @@ namespace Spotify2YT.Services
 
         public string urlPlayList = "https://api.spotify.com/v1/playlists";
 
-        public async Task<List<TrackModel>> GetListPlaylistAsync(string playList, string token)
+        public async Task<List<TrackModel>> GetListPlaylistAsync(string token, string playList)
         {
             Log.Information("GetListPlaylistAsync Init");
             List<TrackModel> TrackModel = [];
@@ -105,8 +105,6 @@ namespace Spotify2YT.Services
                         Cover = cover,
                     };
                 }
-
-                return TrackModel;
             }
             else
             {
@@ -115,7 +113,7 @@ namespace Spotify2YT.Services
                 Log.Error($"Error {statusCode}: {errorContent}");
             }
             Log.Information("GetListPlaylistAsync End");
-            return [];
+            return TrackModel;
         }
 
         private static async Task<SpotifyCredentialsModel?> GetSpotifyCredentialsAsync()

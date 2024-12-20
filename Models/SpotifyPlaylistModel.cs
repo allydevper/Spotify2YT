@@ -2,6 +2,7 @@
 {
     public class SpotifyPlaylistModel
     {
+        public required string Name { get; set; }
         public required Tracks Tracks { get; set; }
     }
 
