@@ -7,10 +7,6 @@
         public required string NameTrack { get; set; }
         public required string Artist { get; set; }
         public bool Active { get; set; } = true;
-
-        public TrackModel()
-        {
-
-        }
+        public string PlayListName { get; set; } = "";
     }
 }

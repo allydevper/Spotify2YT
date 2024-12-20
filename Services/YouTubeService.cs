@@ -56,7 +56,7 @@ namespace Spotify2YT.Services
                     Id = item.Id.VideoId,
                     NameTrack = item.Snippet.Title,
                     Artist = item.Snippet.ChannelTitle,
-                    Cover = item.Snippet.Thumbnails.Standard.Url,
+                    Cover = item.Snippet.Thumbnails.Default__.Url,
                 };
             }
             else
@@ -104,7 +104,7 @@ namespace Spotify2YT.Services
                     {
                         Kind = "youtube#video",
                         VideoId = trackYT.Id
-                    }
+                    },
                 }
             };
 

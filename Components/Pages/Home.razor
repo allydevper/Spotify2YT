@@ -102,8 +102,9 @@
         <div class="col-md-4">
             <div class="input-group mt-2">
                 <input  type="text" 
-                        class="form-control input-custom" 
+                        class="form-control input-custom"
                         placeholder="Nuevo nombre de Playlist"
+                        @bind="PlaylistName"
                         disabled="@(!MainState.ActiveSpotify)">
             </div>
         </div>
@@ -115,7 +116,7 @@
     <section class="container my-5">
         <div class="row justify-content-center">
             <div class="col-md-9 double-box">
-                <div class="list-box">
+                <div class="list-box" style="max-height: 500px; overflow-y: auto;">
                     <h5 class="text-center">Origen</h5>
                     <div class="list-group">
                         @foreach (var _item in SpotifyTrackListModel)
@@ -151,7 +152,7 @@
                         <path d="M21 7l-18 0" />
                     </svg>
                 </div>
-                <div class="list-box">
+                <div class="list-box" style="max-height: 500px; overflow-y: auto;">
                     <h5 class="text-center">Encontrados</h5>
                     <div class="list-group">
                         @foreach (var _item in YouTubeTrackListModel)
@@ -208,17 +209,26 @@
     {
         if (!string.IsNullOrEmpty(PlaylistId))
         {
+            SpotifyTrackListModel = [];
             var playlist = await SpotifyService.GetListPlaylistAsync(MainState.TokenSpotify, PlaylistId);
+            await MainState.SaveStatePlayListNameSpotifyAsync(playlist.FirstOrDefault()?.PlayListName??"");
             SpotifyTrackListModel.AddRange(playlist);
+            StateHasChanged();
         }
     }
 
     private async Task CreatePlaylistYT()
     {
-        if (!string.IsNullOrEmpty(PlaylistName) && SpotifyTrackListModel.Count > 0)
+        if (SpotifyTrackListModel.Count > 0)
         {
-            var playlist = await YouTubeService.CreatePlaylistYTAsync(PlaylistName, SpotifyTrackListModel);
-            YouTubeTrackListModel.AddRange(playlist);
+            var playlistName = !string.IsNullOrEmpty(PlaylistName) ? PlaylistName : MainState.PlayListNameSpotify;
+
+            if (!string.IsNullOrEmpty(playlistName))
+            {
+                var playlist = await YouTubeService.CreatePlaylistYTAsync(playlistName, SpotifyTrackListModel);
+                YouTubeTrackListModel.AddRange(playlist);
+                StateHasChanged();
+            }
         }
     }
 }

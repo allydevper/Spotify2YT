@@ -103,7 +103,9 @@ namespace Spotify2YT.Services
                         NameTrack = _SpotifyPlaylistModel.Track.Name,
                         Artist = _SpotifyPlaylistModel.Track.Artists.ToList().FirstOrDefault()?.Name ?? "",
                         Cover = cover,
+                        PlayListName = SpotifyPlaylistModel?.Name ?? ""
                     };
+                    TrackModel.Add(_TrackModel);
                 }
             }
             else
