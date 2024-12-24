@@ -9,6 +9,13 @@ namespace Spotify2YT.Services
 {
     public class YouTubeService
     {
+        private readonly IConfiguration _configuration;
+
+        public YouTubeService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public async Task<List<TrackModel>> CreatePlaylistYTAsync(string playlistName, List<TrackModel> trackSpotifyModels)
         {
             Log.Information("CreatePlaylistYTAsync Init");
@@ -35,36 +42,44 @@ namespace Spotify2YT.Services
 
         private static async Task<TrackModel> GetTrackYTAsync(YouTubeV3Service youtubeService, TrackModel trackSpotify)
         {
-            Log.Information("GetTrackYTAsync Init");
-            var searchRequest = youtubeService.Search.List("snippet");
-            // Término de búsqueda, como el nombre de la canción o artista
-            searchRequest.Q = $"{trackSpotify.NameTrack} {trackSpotify.Artist}";
-            // Limitar solo a videos
-            searchRequest.Type = "video";
-            // Categoría de música en YouTube
-            //searchRequest.VideoCategoryId = "10";
-            // Número de resultados a devolver
-            searchRequest.MaxResults = 1;
-            var searchResponse = await searchRequest.ExecuteAsync();
+            try
+            {
+                Log.Information("GetTrackYTAsync Init");
+                var searchRequest = youtubeService.Search.List("snippet");
+                // Término de búsqueda, como el nombre de la canción o artista
+                searchRequest.Q = $"{trackSpotify.NameTrack} {trackSpotify.Artist}";
+                // Limitar solo a videos
+                searchRequest.Type = "video";
+                // Categoría de música en YouTube
+                //searchRequest.VideoCategoryId = "10";
+                // Número de resultados a devolver
+                searchRequest.MaxResults = 1;
+                searchRequest.Fields = "items(id/videoId,snippet/title,snippet/channelTitle,snippet/thumbnails/default/url)";
+                var searchResponse = await searchRequest.ExecuteAsync();
 
-            if (searchResponse.Items.Count > 0)
-            {
-                var item = searchResponse.Items[0];
-                Log.Information("GetTrackYTAsync End");
-                return new TrackModel
+                if (searchResponse.Items.Count > 0)
                 {
-                    Id = item.Id.VideoId,
-                    NameTrack = item.Snippet.Title,
-                    Artist = item.Snippet.ChannelTitle,
-                    Cover = item.Snippet.Thumbnails.Default__.Url,
-                };
+                    var item = searchResponse.Items[0];
+                    Log.Information("GetTrackYTAsync End");
+                    return new TrackModel
+                    {
+                        Id = item.Id.VideoId,
+                        NameTrack = item.Snippet.Title,
+                        Artist = item.Snippet.ChannelTitle,
+                        Cover = item.Snippet.Thumbnails.Default__.Url,
+                    };
+                }
+                else
+                {
+                    TrackModel trackYT = trackSpotify;
+                    trackYT.Active = false;
+                    Log.Information("GetTrackYTAsync End");
+                    return trackYT;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TrackModel trackYT = trackSpotify;
-                trackYT.Active = false;
-                Log.Information("GetTrackYTAsync End");
-                return trackYT;
+                throw new Exception(ex.Message);
             }
         }
 
@@ -118,7 +133,7 @@ namespace Spotify2YT.Services
         public async Task<YouTubeV3Service> GetYouTubeServiceAsync()
         {
             Log.Information("GetYouTubeServiceAsync Init");
-            var filePath = "wwwroot/credentials/google_client_secret.json";
+            var filePath = _configuration["AppConfig:GoogleClientSecret"] ?? "";
 
             UserCredential credential;
 

@@ -34,20 +34,6 @@
             </span>
             @(MainState.ActiveSpotify ? "Spotify Conectado" : "Conecta Spotify")
         </button>
-        <!-- YouTube Button -->
-@*         <button class="btn btn-youtube btn-lg px-4 @(MainState.ActiveYT ? "btn-youtube-active" : "")"
-                type="button">
-            <span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                     fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-brand-youtube">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M18 3a5 5 0 0 1 5 5v8a5 5 0 0 1 -5 5h-12a5 5 0 0 1 -5 -5v-8a5 5 0 0 1 5 -5zm-9 6v6a1 1 0 0 0 1.514 .857l5 -3a1 1 0 0 0 0 -1.714l-5 -3a1 1 0 0 0 -1.514 .857z" />
-                </svg>
-            </span>
-            <span>
-                @(MainState.ActiveYT ? "YouTube Conectado" : "Conecta YouTube")
-            </span>
-        </button> *@
     </div>
 </div>
 
@@ -87,17 +73,6 @@
             @(MainState.ActiveYT ? "YouTube Sincronizado" : "Sincroniza YouTube")
         </span>
     </button>
-@*     <button class="btn btn-custom px-4" 
-    disabled="@(!MainState.ActiveSpotify)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
-            <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
-        </svg>
-        Comienza la sincronización
-    </button> *@
     <div class="row justify-content-center my-2">
         <div class="col-md-4">
             <div class="input-group mt-2">
@@ -128,7 +103,8 @@
                                     <p class="mb-1 fs-6 fw-bold">@_item.NameTrack</p>
                                     <p class="mb-1 fw-light fs-small">@_item.Artist</p>
                                 </div>
-                                <button class="btn btn-custom btn-delete rounded-2">
+                                <button class="btn btn-custom btn-delete rounded-2"
+                                        @onclick="()=>DeletePlaylistSpotify(_item)">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                          fill="currentColor"
                                          class="icon icon-tabler icons-tabler-filled icon-tabler-trash-x">
@@ -153,7 +129,7 @@
                     </svg>
                 </div>
                 <div class="list-box" style="max-height: 500px; overflow-y: auto;">
-                    <h5 class="text-center">Encontrados</h5>
+                    <h5 class="text-center">Sincronizados</h5>
                     <div class="list-group">
                         @foreach (var _item in YouTubeTrackListModel)
                         {
@@ -221,6 +197,7 @@
     {
         if (SpotifyTrackListModel.Count > 0)
         {
+            YouTubeTrackListModel = [];
             var playlistName = !string.IsNullOrEmpty(PlaylistName) ? PlaylistName : MainState.PlayListNameSpotify;
 
             if (!string.IsNullOrEmpty(playlistName))
@@ -229,6 +206,14 @@
                 YouTubeTrackListModel.AddRange(playlist);
                 StateHasChanged();
             }
+        }
+    }
+
+    private void DeletePlaylistSpotify(TrackModel? item)
+    {
+        if (item is not null)
+        {
+            SpotifyTrackListModel.Remove(item);
         }
     }
 }
