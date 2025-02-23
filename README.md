@@ -1,6 +1,6 @@
 # Spotify2YT: Sincroniza tus listas de reproducción de Spotify con YouTube
 
-**Spotify2YT** es una aplicación web Blazor que te permite sincronizar de forma sencilla tus listas de reproducción de Spotify con tu cuenta de YouTube. Esta herramienta automatiza el proceso de crear una nueva lista de reproducción en YouTube y agregarle las canciones correspondientes a tu lista de Spotify..
+**Spotify2YT** es una aplicación web Blazor que te permite sincronizar de forma sencilla tus listas de reproducción de Spotify con tu cuenta de YouTube. Esta herramienta automatiza el proceso de crear una nueva lista de reproducción en YouTube y agregarle las canciones correspondientes a tu lista de Spotify.
 
 ## Captura de pantalla
 ![alt text](https://raw.githubusercontent.com/allydevper/Spotify2YT/refs/heads/main/image.png)
